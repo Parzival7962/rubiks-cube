@@ -295,17 +295,17 @@ function scramble() {
     var total_turns = floor(random(20, 30));
     var turns = [turnBlue,turnGreen,turnRed,turnOrange,turnWhite,turnYellow];
     
-    timer_started = !timer_started;
+    
     
     if(!is_scrambled){
         for(var i = 0; i < total_turns; i++){
             var select = floor(random(0,turns.length));
-            
             turns[select]();
-            
         }
+        timer_started = true;
     }
-    else{
+    else if(is_scrambled){
+        timer = -30;
         cube = {
             "top": [["w","o","g"],["w","o"],["w","o","b"],
                     ["w","g"],    ["w"],    ["w","b"],
@@ -316,10 +316,12 @@ function scramble() {
             "bottom": [["y","o","g"],["y","o"],["y","o","b"],
                        ["y","g"],    ["y"],    ["y","b"],
                        ["y","r","g"],["y","r"],["y","r","b"]]
-};
+            };
+        timer_started = false;
     }
     
     is_scrambled = !is_scrambled;
+    
     
 }
 
@@ -327,7 +329,10 @@ draw = function() {
     var current_second = second();
     background(0, 0, 0);
     fill(255, 0, 0);
-    text(timer, 100*1.5, 300*1.5, 30, 30);
+    if(timer >= 0){
+        text(floor(timer/60) + "  :", 80, 300);
+    }
+    text((timer%60), 100, 300);
     if(timer_started){
         if (current_second !== prev_second){
             timer++;
@@ -381,10 +386,13 @@ keyPressed = function(){
     if(key_last_pressed === " "){
         timer_started = !timer_started;
     }
+    else if(key_last_pressed === "`"){
+        turns[key_last_pressed]();
+    }
     
     
     if((timer >= 0 && timer_started) || (!timer_started && timer === -30)){
-        if(key_last_pressed in turns){
+        if((key_last_pressed in turns)&&(key_last_pressed !== "`")){
             turns[key_last_pressed]();
             prev_key_pressed = key_last_pressed;
         }
